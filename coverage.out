@@ -1,0 +1,15 @@
+mode: set
+networking/pkg/udp/ones_complement.go:5.55,6.20 1 1
+networking/pkg/udp/ones_complement.go:6.20,8.3 1 1
+networking/pkg/udp/ones_complement.go:10.2,10.20 1 1
+networking/pkg/udp/ones_complement.go:10.20,12.3 1 1
+networking/pkg/udp/ones_complement.go:14.2,17.19 3 1
+networking/pkg/udp/ones_complement.go:20.39,24.38 2 1
+networking/pkg/udp/ones_complement.go:24.38,32.3 5 1
+networking/pkg/udp/ones_complement.go:34.2,34.22 1 1
+networking/pkg/udp/ones_complement.go:34.22,42.3 4 1
+networking/pkg/udp/ones_complement.go:44.2,44.20 1 1
+networking/pkg/udp/ones_complement.go:47.41,50.31 2 1
+networking/pkg/udp/ones_complement.go:50.31,58.3 3 1
+networking/pkg/udp/ones_complement.go:60.2,60.23 1 1
+networking/pkg/udp/udp.go:5.14,7.2 1 0
