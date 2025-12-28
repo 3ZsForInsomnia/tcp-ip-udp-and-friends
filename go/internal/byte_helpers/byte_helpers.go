@@ -37,3 +37,12 @@ func AreByteArraysEqual(a, b []byte) bool {
 
 	return true
 }
+
+func ConvertIPToUint(ip [4]byte) uint32 {
+	firstByte := uint32(ip[0]) << 24
+	secondByte := uint32(ip[1]) << 16
+	thirdByte := uint32(ip[2]) << 8
+	fourthByte := uint32(ip[3])
+
+	return firstByte | secondByte | thirdByte | fourthByte
+}

@@ -35,6 +35,19 @@ var loggingLevels = map[LogLevels]string{
 	ERROR:   "ERROR",
 }
 
+func GetLogLevelFromString(level string) (LogLevels, error) {
+	switch level {
+	case "WARNING":
+		return WARNING, nil
+	case "ERROR":
+		return ERROR, nil
+	case "INFO":
+		return INFO, nil
+	default:
+		return INFO, fmt.Errorf("invalid log level: %s", level)
+	}
+}
+
 func NewLogger(module *string, minLevelToLog LogLevels) *Logger {
 	return &Logger{
 		Module: module,

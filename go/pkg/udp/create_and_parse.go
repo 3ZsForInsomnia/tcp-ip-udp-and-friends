@@ -6,6 +6,7 @@ import (
 
 	"networking/internal/byte_helpers"
 	"networking/internal/logger"
+	"networking/internal/ports"
 )
 
 // UDPGram represents a UDP datagram structure
@@ -19,14 +20,15 @@ type UDPGram struct {
 
 // NewUDPGram Helper function to create a new UDP datagram struct.
 // Used for internal code and consumers of the package
-func (h *UDPGram) NewUDPGram(ctx *context.Context, sourcePort, destinationPort *uint16, data *[]byte) (*UDPGram, error) {
+func NewUDPGram(ctx *context.Context, sourcePort, destinationPort *uint16, data *[]byte) (*UDPGram, error) {
 	logger := logger.GetLoggerFromContext(*ctx, nil)
 
 	if sourcePort == nil || *sourcePort == 0 {
 		logger.Warn("Source port is set to 0")
+		sourcePort = new(uint16)
 	}
 
-	if destinationPort == nil || *destinationPort == 0 {
+	if destinationPort == nil || *destinationPort == 0 || !ports.IsValidPort(*destinationPort) {
 		err := fmt.Errorf("invalid destination port value: %d", *destinationPort)
 		logger.Error(err.Error())
 
@@ -48,15 +50,15 @@ func (h *UDPGram) NewUDPGram(ctx *context.Context, sourcePort, destinationPort *
 	}
 
 	length := uint16(8 + len(*data))
-	checksum := bytehelpers.CreateOnesComplementChecksum(*data)
 
-	return &UDPGram{
+	result := UDPGram{
 		SourcePort:      *sourcePort,
 		DestinationPort: *destinationPort,
 		Length:          length,
-		Checksum:        checksum,
 		Data:            *data,
-	}, nil
+	}
+
+	return &result, nil
 }
 
 // CreateUDPGram Function to create a raw UDP datagram byte array from the UDPGram struct
@@ -82,13 +84,12 @@ func (h *UDPGram) CreateUDPGram(ctx *context.Context) ([]byte, error) {
 	}
 
 	sourcePortBytes := bytehelpers.Uint16ToByteArray(h.SourcePort)
-
 	destinationPortBytes := bytehelpers.Uint16ToByteArray(h.DestinationPort)
 
 	length := uint16(8 + len(h.Data))
 	lengthBytes := bytehelpers.Uint16ToByteArray(length)
 
-	checksum := bytehelpers.CreateOnesComplementChecksum(h.Data)
+	checksum := h.CreateChecksum()
 	checksumBytes := bytehelpers.Uint16ToByteArray(checksum)
 
 	header := bytehelpers.ConcatenateByteArrays(sourcePortBytes, destinationPortBytes, lengthBytes, checksumBytes, h.Data)
@@ -103,7 +104,7 @@ func ParseRawUDPGram(ctx context.Context, data []byte) (*UDPGram, error) {
 	sourcePort := bytehelpers.ByteArrayToUint16(data[0:2])
 	destinationPort := bytehelpers.ByteArrayToUint16(data[2:4])
 	length := bytehelpers.ByteArrayToUint16(data[4:6])
-	checksum := bytehelpers.ByteArrayToUint16(data[6:8])
+	// checksum := bytehelpers.ByteArrayToUint16(data[6:8])
 
 	if len(data) != int(length) {
 		err := fmt.Errorf("invalid UDP header length. Expected length (%d) does not match actual data length (%d)", length, len(data))
@@ -112,9 +113,12 @@ func ParseRawUDPGram(ctx context.Context, data []byte) (*UDPGram, error) {
 		return nil, err
 	}
 
-	if checksum == 0 {
-		logger.Warn("Checksum is set to 0")
-	}
+	// Will implement checksum verification later
+	// if checksum == 0 {
+	// 	logger.Warn("Checksum is set to 0")
+	// } else {
+	// 	// get checksum of data and verify
+	// }
 
 	if sourcePort == 0 {
 		logger.Warn("Source port is set to 0")
@@ -131,7 +135,7 @@ func ParseRawUDPGram(ctx context.Context, data []byte) (*UDPGram, error) {
 		SourcePort:      sourcePort,
 		DestinationPort: destinationPort,
 		Length:          length,
-		Checksum:        checksum,
+		Checksum:        0,
 		Data:            data[8:],
 	}, nil
 }
@@ -148,4 +152,22 @@ func (h *UDPGram) IsEqual(a *UDPGram) bool {
 	areDataEqual := bytehelpers.AreByteArraysEqual(h.Data, a.Data)
 
 	return areSourcePortsEqual && areDestinationPortsEqual && areLengthsEqual && areChecksumsEqual && areDataEqual
+}
+
+func (h *UDPGram) CreateChecksum() uint16 {
+	// Will use checksums when I implement IPv4 header creation
+	return uint16(0)
+
+	// sourcePortBytes := bytehelpers.Uint16ToByteArray(h.SourcePort)
+	// destinationPortBytes := bytehelpers.Uint16ToByteArray(h.DestinationPort)
+	// lengthBytes := bytehelpers.Uint16ToByteArray(h.Length)
+	//
+	// concatenatedBytes := bytehelpers.ConcatenateByteArrays(
+	// 	sourcePortBytes,
+	// 	destinationPortBytes,
+	// 	lengthBytes,
+	// 	h.Data,
+	// )
+	//
+	// return bytehelpers.CreateOnesComplementChecksum(concatenatedBytes)
 }
