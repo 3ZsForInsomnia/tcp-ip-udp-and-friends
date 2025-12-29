@@ -18,7 +18,7 @@ build: $(FILES)
 	$(addprefix build-, $(CMDS))
 
 build-%: $(shell find $(CMD)/$* $(PKG)/$* -name '*.go' 2>/dev/null)
-	$(GO) build $(GOFLAGS) -o $(BIN)/$* $(CMD)/$*/main.go
+	$(GO) build $(GOFLAGS) -o $(BIN)/$*.bin $(CMD)/$*/main.go
 
 run-%: $(shell find $(CMD)/$* $(PKG)/$* -name '*.go' 2>/dev/null)
 	CompileDaemon -command="$(GO) run $(CMD)/$*/main.go" -directory=$(PKG)/$* -color=true
