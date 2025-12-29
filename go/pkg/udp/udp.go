@@ -1,3 +1,4 @@
+// Package udp provides functionality to create, send, and listen for UDP datagrams.
 package udp
 
 import (
@@ -22,14 +23,16 @@ func Send(config types.Config, data []byte) error {
 		return destError
 	}
 
-	conn, err := net.ListenPacket("ip4:17", "127.0.0.1")
+	sourcePortStr := fmt.Sprint(*config.SourcePort)
+
+	conn, err := net.ListenPacket("udp", "127.0.0.1:"+sourcePortStr)
 	if err != nil {
 		l.Error(err.Error())
 		return err
 	}
 	defer conn.Close()
 
-	datagram, err := NewUDPGram(&ctx, nil, config.DestinationPort, &data)
+	datagram, err := NewUDPGram(&ctx, config.SourcePort, config.DestinationPort, &data)
 	if err != nil {
 		l.Error(err.Error())
 		return err
@@ -41,7 +44,7 @@ func Send(config types.Config, data []byte) error {
 		return err
 	}
 
-	addr := net.IPAddr{IP: net.IPv4(127, 0, 0, 1)}
+	addr := net.UDPAddr{IP: net.IPv4(127, 0, 0, 1), Port: int(*config.DestinationPort)}
 
 	_, sendErr := conn.WriteTo(datagramBytes, &addr)
 	if sendErr != nil {
@@ -52,34 +55,43 @@ func Send(config types.Config, data []byte) error {
 	return nil
 }
 
-func Listen(config types.Config) error {
+func Listen(config types.Config, c chan UDPGram) {
 	l := logger.NewLogger(&moduleName, *config.LogLevel)
 	ctx := l.WithLogger(context.Background())
 
 	if config.ListenOnPort == nil {
-		defaultPort := uint16(8080)
-		config.ListenOnPort = &defaultPort
-		l.Info("ListenOnPort is not set in config, using default port 8080")
+		l.Error("ListenOnPort is not set in config")
+		panic("ListenOnPort is not set in config")
 	}
 
-	conn, err := net.ListenPacket("ip4:17", "127.0.0.1")
+	destPortStr := fmt.Sprint(*config.ListenOnPort)
+
+	conn, err := net.ListenPacket("udp", "127.0.0.1:"+destPortStr)
 	if err != nil {
 		l.Error(err.Error())
-		return err
+		panic(err)
 	}
-	defer conn.Close()
+	defer func() {
+		err := conn.Close()
+		if err != nil {
+			l.Error("Error closing connection: " + err.Error())
+			panic(err)
+		}
+	}()
 
 	buffer := make([]byte, 65535)
 	for {
-		n, addr, err := conn.ReadFrom(buffer)
+		n, _, err := conn.ReadFrom(buffer)
 		if err != nil {
 			l.Error("Error reading incoming packet: " + err.Error())
 		} else {
-			l.Info(fmt.Sprintf("Received %d bytes from %s", n, addr.String()))
-			_, err := ParseRawUDPGram(ctx, buffer[:n])
+			// l.Info(fmt.Sprintf("Received %d bytes from %s", n, addr.String()))
+			gram, err := ParseRawUDPGram(ctx, buffer[:n])
 			if err != nil {
 				l.Error("Error parsing UDP datagram: " + err.Error())
 			}
+
+			c <- *gram
 		}
 	}
 }

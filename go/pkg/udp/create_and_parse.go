@@ -154,6 +154,23 @@ func (h *UDPGram) IsEqual(a *UDPGram) bool {
 	return areSourcePortsEqual && areDestinationPortsEqual && areLengthsEqual && areChecksumsEqual && areDataEqual
 }
 
+func (h UDPGram) String(indent uint) string {
+	spaces := ""
+	for range indent {
+		spaces += " "
+	}
+
+	str := spaces + "Source Port: " + fmt.Sprintf("%d", h.SourcePort) + "\n"
+	str += spaces + "Destination Port: " + fmt.Sprintf("%d", h.DestinationPort) + "\n"
+	str += spaces + "Length: " + fmt.Sprintf("%d", h.Length) + "\n"
+	// str += spaces + "Checksum: " + fmt.Sprintf("0x%X", h.Checksum) + "\n"
+
+	data := string(h.Data)
+	str += spaces + "Data: " + data
+
+	return str
+}
+
 func (h *UDPGram) CreateChecksum() uint16 {
 	// Will use checksums when I implement IPv4 header creation
 	return uint16(0)

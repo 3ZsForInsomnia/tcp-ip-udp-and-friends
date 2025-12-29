@@ -48,6 +48,10 @@ func GetLogLevelFromString(level string) (LogLevels, error) {
 	}
 }
 
+func GetStringFromLogLevel(level LogLevels) string {
+	return loggingLevels[level]
+}
+
 func NewLogger(module *string, minLevelToLog LogLevels) *Logger {
 	return &Logger{
 		Module: module,
@@ -80,7 +84,7 @@ func (l *Logger) log(level LogLevels, message string) string {
 
 	prefix := loggingLevels[level] + " "
 	if l.Module != nil {
-		prefix = *l.Module + ": "
+		prefix = *l.Module + "@" + GetStringFromLogLevel(level) + ": "
 	}
 
 	now := time.Now()
