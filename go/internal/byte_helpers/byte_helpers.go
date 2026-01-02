@@ -1,5 +1,7 @@
 package bytehelpers
 
+import "strings"
+
 func Uint16ToByteArray(value uint16) []byte {
 	highByte := byte(value >> 8)
 	lowByte := byte(value & 0xff)
@@ -45,4 +47,19 @@ func ConvertIPToUint(ip [4]byte) uint32 {
 	fourthByte := uint32(ip[3])
 
 	return firstByte | secondByte | thirdByte | fourthByte
+}
+
+func GetNullTerminatedStringFromBytes(data []byte) (str string, endIndex int) {
+	var result strings.Builder
+
+	i := 0
+	for ; i < len(data) || data[i] == 0; i++ {
+		result.WriteString(string(data[i]))
+	}
+
+	if i < len(data) {
+		i++ // Move past the null terminator
+	}
+
+	return result.String(), i
 }
