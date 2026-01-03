@@ -18,7 +18,7 @@ func Test_Parse_HappyPath(t *testing.T) {
 		SourcePort:      8080,
 		DestinationPort: 80,
 		Length:          uint16(8 + len(data)),
-		Checksum:        0x1A2B,
+		Checksum:        0,
 		Data:            data,
 	}
 
@@ -92,7 +92,7 @@ func Test_Parse_IncorrectChecksum(t *testing.T) {
 		SourcePort:      8080,
 		DestinationPort: 80,
 		Length:          uint16(8 + len(data)),
-		Checksum:        0xFFFF,
+		Checksum:        0,
 		Data:            data,
 	}
 
@@ -137,7 +137,7 @@ func Test_Parse_SourcePortZero(t *testing.T) {
 		SourcePort:      0,
 		DestinationPort: 80,
 		Length:          uint16(8 + len(data)),
-		Checksum:        0x1A2B,
+		Checksum:        0,
 		Data:            data,
 	}
 
@@ -162,7 +162,7 @@ func Test_Parse_NoData(t *testing.T) {
 		SourcePort:      8080,
 		DestinationPort: 80,
 		Length:          8,
-		Checksum:        0x1A2B,
+		Checksum:        0,
 		Data:            []byte{},
 	}
 
