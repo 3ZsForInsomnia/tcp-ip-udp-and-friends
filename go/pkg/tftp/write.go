@@ -12,8 +12,12 @@ func (t *TFTPConnection) OpenWriteConnection() error {
 		Opcode:     2, // WRQ
 	}
 
-	serializedRequest := writeRequest.Serialize()
-	err := udp.Send(types.Config(t.Config), serializedRequest)
+	serializedRequest, err := writeRequest.Serialize()
+	if err != nil {
+		return err
+	}
+
+	err = udp.Send(types.Config(t.Config), serializedRequest)
 
 	return err
 }
@@ -24,8 +28,12 @@ func (t *TFTPConnection) SendFinalWriteAck() error {
 		Opcode:     4, // ACK
 	}
 
-	serializedAck := finalAck.Serialize()
-	err := udp.Send(types.Config(t.Config), serializedAck)
+	serializedAck, err := finalAck.Serialize()
+	if err != nil {
+		return err
+	}
+
+	err = udp.Send(types.Config(t.Config), serializedAck)
 
 	return err
 }

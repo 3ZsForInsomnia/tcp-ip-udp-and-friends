@@ -18,13 +18,16 @@ func (t *TFTPConnection) OpenReadConnection() error {
 		Connection: *t,
 	}
 
-	data := firstPacket.Serialize()
+	data, err := firstPacket.Serialize()
+	if err != nil {
+		return err
+	}
 	if data == nil {
 		err := fmt.Errorf("failed to serialize packet for opening connection")
 		return err
 	}
 
-	err := udp.Send(types.Config(t.Config), data)
+	err = udp.Send(types.Config(t.Config), data)
 
 	return err
 }
@@ -35,8 +38,12 @@ func (t *TFTPConnection) sendFinalReadAck() error {
 		Opcode:     4, // ACK
 	}
 
-	serializedAck := finalAck.Serialize()
-	err := udp.Send(types.Config(t.Config), serializedAck)
+	serializedAck, err := finalAck.Serialize()
+	if err != nil {
+		return err
+	}
+
+	err = udp.Send(types.Config(t.Config), serializedAck)
 
 	return err
 }

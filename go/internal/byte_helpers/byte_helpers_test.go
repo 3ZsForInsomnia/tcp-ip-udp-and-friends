@@ -2,6 +2,7 @@ package bytehelpers
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
@@ -92,5 +93,40 @@ func Test_AreByteArraysEqual_UnequalArrays(t *testing.T) {
 
 	if actual != expected {
 		t.Errorf("AreByteArraysEqual(%v, %v) = %v; want %v", input1, input2, actual, expected)
+	}
+}
+
+func Test_GetNullTerminatedStringFromBytes_HappyPath(t *testing.T) {
+	firstExpected := "abc. "
+	startOfSecondWord := 6
+	secondExpected := "Hello"
+	startOfThirdWord := 6 // This is relative to the end of the first word!
+	thirdExpected := "World"
+
+	input := []byte{'a', 'b', 'c', '.', ' ', 0, 'H', 'e', 'l', 'l', 'o', 0, 'W', 'o', 'r', 'l', 'd'}
+
+	firstActual, firstEndIndex := GetNullTerminatedStringFromBytes(input)
+	fmt.Println("First end index:", firstEndIndex)
+	if firstActual != firstExpected {
+		t.Errorf("GetNullTerminatedStringFromBytes(...) first string = %v; want %v", firstActual, firstExpected)
+	}
+	if firstEndIndex != startOfSecondWord {
+		t.Errorf("GetNullTerminatedStringFromBytes(...) first end index = %v; want %v", firstEndIndex, startOfSecondWord)
+	}
+
+	input2 := input[firstEndIndex:]
+	secondActual, secondEndIndex := GetNullTerminatedStringFromBytes(input2)
+	fmt.Println("Second end index:", secondEndIndex)
+	if secondActual != secondExpected {
+		t.Errorf("GetNullTerminatedStringFromBytes(...) second string = %v; want %v", secondActual, secondExpected)
+	}
+	if secondEndIndex != startOfThirdWord {
+		t.Errorf("GetNullTerminatedStringFromBytes(...) second end index = %v; want %v", secondEndIndex, startOfThirdWord)
+	}
+
+	input3 := input2[secondEndIndex:]
+	thirdActual, _ := GetNullTerminatedStringFromBytes(input3)
+	if thirdActual != thirdExpected {
+		t.Errorf("GetNullTerminatedStringFromBytes(...) third string = %v; want %v", thirdActual, thirdExpected)
 	}
 }

@@ -21,7 +21,7 @@ func (t *TFTPConnection) CreateAck(packet *TFTPPacket) (*TFTPPacket, error) {
 		}
 
 		if len(*packet.Data) >= maxDataLength {
-			err := t.closeReadConnection(t.Data)
+			err := t.CloseReadConnection(t.Data)
 			if err != nil {
 				return nil, err
 			}

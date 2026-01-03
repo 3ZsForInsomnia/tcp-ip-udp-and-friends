@@ -1,6 +1,8 @@
 package bytehelpers
 
-import "strings"
+import (
+	"strings"
+)
 
 func Uint16ToByteArray(value uint16) []byte {
 	highByte := byte(value >> 8)
@@ -53,7 +55,11 @@ func GetNullTerminatedStringFromBytes(data []byte) (str string, endIndex int) {
 	var result strings.Builder
 
 	i := 0
-	for ; i < len(data) || data[i] == 0; i++ {
+	for ; i < len(data); i++ {
+		if data[i] == 0 {
+			break
+		}
+
 		result.WriteString(string(data[i]))
 	}
 
