@@ -85,7 +85,6 @@ func Listen(config types.Config, c chan UDPGram) {
 		if err != nil {
 			l.Error("Error reading incoming packet: " + err.Error())
 		} else {
-			// l.Info(fmt.Sprintf("Received %d bytes from %s", n, addr.String()))
 			gram, err := ParseRawUDPGram(ctx, buffer[:n])
 			if err != nil {
 				l.Error("Error parsing UDP datagram: " + err.Error())

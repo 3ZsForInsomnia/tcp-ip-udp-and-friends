@@ -19,7 +19,7 @@ func main() {
 	}
 
 	var input string
-	flag.StringVar(&input, "i", "Hello there, bitchfuck!", "Input string to send via UDP")
+	flag.StringVar(&input, "i", "Hello there, hi!", "Input string to send via UDP")
 	if command == "send" && input == "" {
 		panic("Input string cannot be empty when command is 'send'")
 	}

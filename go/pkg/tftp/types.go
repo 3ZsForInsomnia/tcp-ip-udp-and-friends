@@ -94,6 +94,10 @@ func StringToMode(modeStr string) (Mode, error) {
 	return 0, err
 }
 
+func GetDefaultMode() Mode {
+	return Mode(2)
+}
+
 type TFTPConnection struct {
 	Config     types.Config
 	Connected  bool
